@@ -123,6 +123,7 @@ public class MainActivity extends Activity implements IWordButtonClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toast.makeText(this, "xxx", Toast.LENGTH_SHORT).show();
         //读取数据
         int[] data = Util.loadData(this);
         mCurrentStageIndex = data[Const.INDEX_LOAD_SAVESTAGE];
