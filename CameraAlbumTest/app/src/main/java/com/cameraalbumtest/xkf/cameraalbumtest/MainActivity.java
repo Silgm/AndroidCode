@@ -1,4 +1,4 @@
-package com.firstcodeofandroid.xkf.cameraalbumtest;
+package com.cameraalbumtest.xkf.cameraalbumtest;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -12,25 +12,27 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
+
     public static final int TAKE_PHOTO = 1;
-    private Button mButton;
+    private Button takePhoto;
+    private Button chooseAlbum;
     private ImageView mImageView;
     private Uri imageUri;
+    private static final int CHHOSE_PHOTO = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mButton = (Button) findViewById(R.id.take_photo);
+        takePhoto = (Button) findViewById(R.id.take_photo);
         mImageView = (ImageView) findViewById(R.id.picture);
-        mButton.setOnClickListener(new View.OnClickListener() {
+        takePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //创建一个文件来保存等会拍下来的照片
@@ -48,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= 24) {
                     //这里使用到了FileProvider，所以还要在清单文件中注册它
                     imageUri = FileProvider.getUriForFile(MainActivity.this,
-                            "com.firstcodeofandroid.xkf.cameraalbumtest.fileprovider", file);
+                            "com.cameraalbumtest.xkf.cameraalbumtest.fileprovider", file);
 
                 } else {
                     imageUri = Uri.fromFile(file);
@@ -64,6 +66,13 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                 //这里还需要一个int值来作为结果处理时候的标识码
                 startActivityForResult(intent, TAKE_PHOTO);
+            }
+        });
+        chooseAlbum = (Button) findViewById(R.id.choose_from_album);
+        chooseAlbum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
     }
@@ -85,4 +94,5 @@ public class MainActivity extends AppCompatActivity {
             default:
         }
     }
+
 }
