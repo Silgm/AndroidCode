@@ -1,17 +1,27 @@
 package com.cameraalbumtest.xkf.cameraalbumtest;
 
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.content.ContentUris;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private Button chooseAlbum;
     private ImageView mImageView;
     private Uri imageUri;
-    private static final int CHHOSE_PHOTO = 2;
+    private static final int CHOOSE_PHOTO = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,10 +82,40 @@ public class MainActivity extends AppCompatActivity {
         chooseAlbum.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                //调用图库需要申请权限
+                //先检查是不是有权限
+                if (ContextCompat.checkSelfPermission(MainActivity.this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    //没有权限就提出申请
+                    ActivityCompat.requestPermissions(MainActivity.this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                    //申请权限的话，结果会调用onRequestPermissionsResult方法，所以重写它
+                } else {
+                    //有的话就调用这个方法来打开图库
+                    openAlbum();
+                }
             }
         });
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        //参数grantResults放的是申请的结果的集合
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            openAlbum();
+        } else {
+            Toast.makeText(this, "你取消了打开图库的权限，所以不能调用", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void openAlbum() {
+        //同样的，隐式打开图库的程序
+        Intent intent = new Intent("android.intent.action.GET_CONTENT");
+        //设置一下打开文件的类型，不然会打开一堆
+        intent.setType("image/*");
+        startActivityForResult(intent, CHOOSE_PHOTO);
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -83,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
             case TAKE_PHOTO:
                 if (resultCode == RESULT_OK) {
                     try {
+                        //加载并且显示图片
                         Bitmap bitmap = BitmapFactory.decodeStream
                                 (getContentResolver().openInputStream(imageUri));
                         mImageView.setImageBitmap(bitmap);
@@ -91,8 +132,75 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 break;
-            default:
+            case CHOOSE_PHOTO:
+                if (resultCode == RESULT_OK) {
+                    //这里对于android 4.4有着不同的处理
+                    if (Build.VERSION.SDK_INT >= 19) {
+                        //对于大于android 4.4的版本，选取图库中的版本是返回一个封装过的uri
+                        handleImageOnKitKat(data);
+                    } else {
+                        //对于低于android 4.4的版本，选取图库中的图片是返回一个uri，然后访问
+                        handleImageBeforeKitKat(data);
+                    }
+                }
+                break;
         }
     }
+
+    private void handleImageOnKitKat(Intent data) {
+        //content://com.android.providers.media.documents/document/image%3A74
+        //假设这是图片路径的uri，现在需要解析它
+        String imagePath = null;
+        Uri uri = data.getData();
+        if (DocumentsContract.isDocumentUri(this, uri)) {
+            // 如果是document类型的Uri，则通过document id处理
+            String docId = DocumentsContract.getDocumentId(uri);
+            if ("com.android.providers.media.documents".equals(uri.getAuthority())) {
+                String id = docId.split(":")[1]; // 解析出数字格式的id
+                String selection = MediaStore.Images.Media._ID + "=" + id;
+                imagePath = getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection);
+            } else if ("com.android.providers.downloads.documents".equals(uri.getAuthority())) {
+                Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(docId));
+                imagePath = getImagePath(contentUri, null);
+            }
+        }
+        //它现在可能是content打头的，这样的话就调用getImagePath方法来解析
+        else if ("content".equalsIgnoreCase(uri.getScheme())) {
+            imagePath = getImagePath(uri, null);
+        }
+        //也有可能是file打头的，直接过去路径就好
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            imagePath = uri.getPath();
+        }
+        //调用这个方法来加载显示图片
+        displayImage(imagePath);
+    }
+
+    private void displayImage(String path) {
+        if (path != null) {
+            Bitmap bitmap = BitmapFactory.decodeFile(path);
+            mImageView.setImageBitmap(bitmap);
+        } else {
+            Toast.makeText(this, "加载失败", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String getImagePath(Uri uri, String selection) {
+        String path = null;
+        // 通过Uri和selection来获取真实的图片路径
+        Cursor cursor = getContentResolver().query(uri, null, selection, null, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            }
+            cursor.close();
+        }
+        return path;
+    }
+
+    private void handleImageBeforeKitKat(Intent data) {
+
+    }
+
 
 }
