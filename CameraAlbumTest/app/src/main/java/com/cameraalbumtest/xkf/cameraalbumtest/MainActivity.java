@@ -199,7 +199,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleImageBeforeKitKat(Intent data) {
-
+        Uri uri = data.getData();
+        String imagePath = getImagePath(uri, null);
+        displayImage(imagePath);
     }
 
 

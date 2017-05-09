@@ -38,9 +38,9 @@
             <!--app:layout_collapseMode="pin"这个属性表示在折叠过程中位置始终不变-->
             <android.support.v7.widget.Toolbar
                 android:id="@+id/tool_bar"
-                android:elevation="4dp"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:elevation="4dp"
                 app:layout_collapseMode="pin"
                 />
         </android.support.design.widget.CollapsingToolbarLayout>
