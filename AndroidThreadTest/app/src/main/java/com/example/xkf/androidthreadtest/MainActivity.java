@@ -10,6 +10,8 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
     private TextView mText;
     public static final int UPDATA_TEXT = 1;
+    //可以用匿名内部类的方法复写掉Handler 的handlermesage方法
+    //根据msg的what来选择操作
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -31,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
     public void change(View view) {
         switch (view.getId()) {
             case R.id.change_text:
+                //创建一个message
+                //设置what
+                //发送
                 Message message = new Message();
                 message.what = UPDATA_TEXT;
                 handler.sendMessage(message);
