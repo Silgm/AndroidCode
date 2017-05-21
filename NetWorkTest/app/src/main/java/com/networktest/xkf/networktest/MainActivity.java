@@ -13,6 +13,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class MainActivity extends AppCompatActivity {
     private TextView mContent;
 
@@ -24,7 +28,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void send(View view) {
-        sendRequestWithHttpUrlConnection();
+        //sendRequestWithHttpUrlConnection();
+        sendRequestWithOkHttp();
+
+    }
+
+    private void sendRequestWithOkHttp() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //对于OkHttp这个工具来说
+                //主要还是三个对象在作用
+
+                //第一个是这个client
+                OkHttpClient client = new OkHttpClient();
+                //第二个是request
+                Request request = new Request.Builder()
+                        .url("https://www.baidu.com")
+                        .build();
+                try {
+                    //第三个是这个结果
+                    //response
+                    Response response = client.newCall(request).execute();
+                    String data = response.body().string();
+                    showContent(data);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     private void sendRequestWithHttpUrlConnection() {
