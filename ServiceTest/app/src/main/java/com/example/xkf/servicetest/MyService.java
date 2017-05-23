@@ -1,10 +1,15 @@
 package com.example.xkf.servicetest;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.IntDef;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 public class MyService extends Service {
@@ -13,6 +18,7 @@ public class MyService extends Service {
     }
 
     private DownloadBinder mBinder = new DownloadBinder();
+
     //自己创建一个绑定类
     //继承Binder
     class DownloadBinder extends Binder {
@@ -38,6 +44,19 @@ public class MyService extends Service {
     public void onCreate() {
         Log.e("dalongmao", "onCreate");
         super.onCreate();
+        Intent intent = new Intent(this, MainActivity.class);
+        PendingIntent pi = PendingIntent.getActivity(this, 0, intent, 0);
+        Notification notification = new NotificationCompat.Builder(this)
+                .setContentTitle("This is Content Title")
+                .setContentText("This is Content Text")
+                .setWhen(System.currentTimeMillis())
+                .setSmallIcon(R.mipmap.ic_launcher_round)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+                .setContentIntent(pi)
+                .build();
+        //流氓一般的前台服务
+        //他会放一个通知
+        startForeground(1, notification);
     }
 
     //再是onStartCommand

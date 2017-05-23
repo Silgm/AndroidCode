@@ -17,10 +17,11 @@
             </intent-filter>
         </activity>
 
+        <service android:name=".MyIntentService" />
         <service
             android:name=".MyService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
     </application>
 
 </manifest>

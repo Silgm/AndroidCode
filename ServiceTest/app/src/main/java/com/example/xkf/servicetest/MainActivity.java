@@ -56,4 +56,10 @@ public class MainActivity extends AppCompatActivity {
     public void unbindService(View view) {
         unbindService(serviceConnection);
     }
+
+    public void startIntentService(View view) {
+        Intent intent = new Intent(this, MyIntentService.class);
+        Log.e("dalongmao", "Thread id is:" + Thread.currentThread().getId());
+        startService(intent);
+    }
 }
