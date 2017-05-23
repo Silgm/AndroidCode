@@ -11,14 +11,28 @@
         android:id="@+id/start_service"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start Service"
         android:onClick="startService"
-        />
+        android:text="Start Service" />
 
     <Button
         android:id="@+id/stop_service"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Stop Service"
-        android:onClick="stopService"/>
+        android:onClick="stopService"
+        android:text="Stop Service" />
+
+    <Button
+        android:id="@+id/bind_service"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="bindService"
+        android:text="BindService" />
+
+    <Button
+        android:id="@+id/unbind_service"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="unbindService"
+        android:text="UnbindService" />
+
 </LinearLayout>
