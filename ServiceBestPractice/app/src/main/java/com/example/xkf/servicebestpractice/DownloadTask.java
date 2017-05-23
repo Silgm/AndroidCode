@@ -13,7 +13,11 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class DownloadTask extends AsyncTask<String, Integer, Integer> {
-    private int TYPE_FAILED = 1;
+    private static final int TYPE_CANCELED = 3;
+    private static final int TYPE_FAILED = 1;
+    private static final int TYPE_PAUSED = 2;
+    private boolean isCanceled = false;
+    private boolean isPaused = false;
 
     @Override
     protected Integer doInBackground(String... params) {
@@ -54,7 +58,19 @@ public class DownloadTask extends AsyncTask<String, Integer, Integer> {
                 int total = 0;
                 int len;
                 while ((len = is.read(b)) != -1) {
-
+                    if (isCanceled) {
+                        return TYPE_CANCELED;
+                    } else if (isPaused) {
+                        return TYPE_PAUSED;
+                    } else {
+                        total += len;
+                        //写入文件
+                        savedFile.write(b, 0, len);
+                        //算出进度总和
+                        int progress = (int) (((total + downloadLength) / contentLength) * 100);
+                        //更新数据
+                        publishProgress(progress);
+                    }
                 }
             }
         } catch (IOException e) {
