@@ -2,7 +2,7 @@ package com.example.xkf.servicebestpractice;
 
 
 public interface DownloadListener {
-    void onProgress(int progress);
+    void onProgress(double progress);
 
     void onSuccess();
 
