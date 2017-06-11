@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--duration设置持续时间-->
+    <!--fillAfter设置结束的时候是不是停在最后一下-->
+    <!--fromXScale,fromYScale 动画开始前X,Y的缩放 0.0为不显示 1.0为正常大小-->
+    <!--  Interpolator 被用来修饰动画效果 定义动画的变化率
+    可以使存在的动画效果accelerated(加速) decelerated(减速) repeated(重复),bounced(弹跳)等-->
+    <!--pivotX pivotY表示从哪把动画展示出来-->
+    <!--toXScale toYScale 动画最终缩放的倍数 1.0为正常大小 大于1.0放大-->
+    <scale
+        android:duration="1000"
+        android:fillAfter="false"
+        android:fromXScale="0.0"
+        android:fromYScale="0.0"
+        android:pivotX="10%"
+        android:pivotY="10%"
+        android:toXScale="1.0"
+        android:toYScale="1.0" />
+</set>
